@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    image: 'ghcr.io/baohule/casinoadmin:latest'
+    container_name: backend
+    networks:
+      - host-net
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - logs:/app/logs
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  postgres:
+    image: 'postgres:latest'
+    container_name: postgres
+    networks:
+      - host-net
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1121
+      - POSTGRES_DB=casino_admin
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  redis:
+    image: 'redis/redis-stack:latest'
+    container_name: redis
+    networks:
+      - host-net
+
+
+
+volumes:
+  postgres-data:
+  logs:
+
+networks:
+  host-net:
+    external: true
+
